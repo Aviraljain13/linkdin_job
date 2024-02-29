@@ -1,5 +1,5 @@
 from flask import Flask, jsonify,request
-import job_datas
+import job_datas as datas
 import math
 app = Flask(__name__)
 
@@ -10,11 +10,14 @@ def info_job():
     loc = request.args.get('location', type=str)
     tim = request.args.get('when_generated', type=str)
     job_loc = request.args.get('job_loc', type=str)
-    val=job_datas.job_data(loc,math.ceil(page/5),job_loc,tim)
+    val=datas.job_data(loc,math.ceil(page/5),job_loc,tim)
     num=page%5
     start=(num-1)*5
-    end=(num)*5 
-    return val[start:end]
+    end=(num)*5
+    if val!=None:
+        return jsonify(val[start:end])
+    else:
+        return []
 
 
 
@@ -27,7 +30,7 @@ def get_audio_details():
     job_loc = request.args.get('job_loc', type=str)
     gen = request.args.get('when_generated', type=str)
     page_num = request.args.get('page_num', type=int)
-    details=job_datas.start(job_name,loc,job_type,job_exp,page_num,job_loc,gen)
+    details=datas.start(job_name,loc,job_type,job_exp,page_num,job_loc,gen)
 
     # num=math.floor(page_num/5)
     num=page_num%5
@@ -37,10 +40,12 @@ def get_audio_details():
     # for detail in details:
     #     for job in detail:
     #         job_data.append(job)
-    
+
     # return jsonify(job_data)
     print(details)
-    return jsonify(details[start:end])
+    if details!=None:
+        return jsonify(details[start:end])
+    else:
+        return []
 if __name__=="__main__":
-    app.run() 
-
+    app.run()

@@ -7,7 +7,7 @@ import json
 # location = geo location
 
 def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
-    
+
     j_loc=''
     gene=''
     # job location
@@ -30,7 +30,7 @@ def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
             gene='r604800'
         if 'past month' in gen.lower():
             gene='r2592000,'
-        
+
     # job type
     type=''
     if job_type!=None:
@@ -63,21 +63,21 @@ def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
         if exp[:-1]==',':
             u_exp=exp[:-1]+''
             exp=u_exp
-    
+
     if page_num==None:
         page_num=0
     if page_num/5==(page_num//5):
         url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&f_WT={j_loc}&start={str(25*(page_num//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
-        
+
     else:
         url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&&f_WT={j_loc}&start={str(25*((page_num-1)//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
-    
+
     return get_job(url)
 
 
 def job_data(loc,page,job_loc,t_time):
     a=''
-    
+
     #job location
     j_loc=''
     if job_loc!='' and job_loc!=None:
@@ -101,7 +101,7 @@ def job_data(loc,page,job_loc,t_time):
         if '15' in t_time.lower():
             t_= '_15_DAYS'
 
-    
+
     if 'spain' in loc.lower():
         url=requests.get(f'https://www.infojobs.net/webapp/offers/search?keyword=&teleworkingIds={j_loc}&segmentId=&page={str(page)}&sortBy=PUBLICATION_DATE&onlyForeignCountry=false&sinceDate={t_}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
         a=json.loads(url.text)
@@ -121,10 +121,10 @@ def get_job(url):
         # Parse the HTML content of the page
         soup = BeautifulSoup(url.text, 'html.parser')
         div=soup.find_all('div',class_='base-card relative w-full hover:no-underline focus:no-underline base-card--link base-search-card base-search-card--link job-search-card')
-        
+
         for i in div:
-            job={    
-            'job_title':i.find('h3',class_='base-search-card__title').text.strip(), 
+            job={
+            'job_title':i.find('h3',class_='base-search-card__title').text.strip(),
             'url':i.find('a')['href'],
             'company':i.find('a',class_='hidden-nested-link').text.strip(),
             'when_generated':i.find('time').text.strip(),
@@ -132,7 +132,7 @@ def get_job(url):
             'image':i.find('img')['data-delayed-url'].replace('amp;','')
             }
             job_data.append(job)
-        
+
         return job_data
     else:
-        return url.status_code
+        return None
