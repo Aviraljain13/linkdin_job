@@ -11,7 +11,7 @@ def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
     j_loc=''
     gene=''
     # job location
-    if job_loc!='' and job_loc!='':
+    if job_loc!='' and job_loc!=None:
         if 'rem' in job_loc.lower():
             j_loc+='2,'
         if 'site' in job_loc.lower():
@@ -23,7 +23,7 @@ def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
             j_loc=u_job_loc
             print(j_loc)
     # when generated
-    if gen!='':
+    if gen!='' and gen!=None:
         if '24' in gen.lower():
             gene='r86400'
         if 'past week' in gen.lower():
@@ -110,4 +110,4 @@ def get_job(url):
         print(len(job_data))
         return job_data
     else:
-        return url.status_code
+        return None

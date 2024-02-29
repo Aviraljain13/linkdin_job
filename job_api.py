@@ -10,10 +10,13 @@ def rot():
     loc = request.args.get('location', type=str)
     
     val=job_datas.job_data(loc,math.ceil(page/5))
-    num=math.floor(page/5)
+    num=page%5
     start=(num)*5
-    end=(num+1)*5 
-    return val[start:end]
+    end=(num+1)*5
+    if val!=None: 
+        return val[start:end]
+    else:
+        return []
 
 
 
@@ -28,7 +31,7 @@ def get_audio_details():
     page_num = request.args.get('page_num', type=int)
     details=job_datas.start(job_name,loc,job_type,job_exp,page_num,job_loc,gen)
     print(details)
-    num=math.floor(page_num/5)
+    num=page_num%5
     start=(num)*5
     end=(num+1)*5
 
@@ -38,7 +41,10 @@ def get_audio_details():
     #         job_data.append(job)
     
     # return jsonify(job_data)
-    return jsonify(details[start:end])
+    if details!=None:
+        return jsonify(details[start:end])
+    else:
+        return []
 if __name__=="__main__":
     app.run() 
 
