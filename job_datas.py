@@ -67,21 +67,46 @@ def start(job_name,loc,job_type,job_exp,page_num,job_loc,gen):
     if page_num==None:
         page_num=0
     if page_num/5==(page_num//5):
-        url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={job_name}&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&f_WT={j_loc}&start={str(25*(page_num//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
+        url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&f_WT={j_loc}&start={str(25*(page_num//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
+        
     else:
-        url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={job_name}&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&&f_WT={j_loc}&start={str(25*((page_num-1)//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
+        url=requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=&location={loc}&trk=public_jobs_jobs-search-bar_search-submi&f_TPR={gene}&f_JT={type}&f_E={exp}&&f_WT={j_loc}&start={str(25*((page_num-1)//5))}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
     
-    print(get_job(url))
     return get_job(url)
 
 
-def job_data(loc,page):
+def job_data(loc,page,job_loc,t_time):
     a=''
+    
+    #job location
+    j_loc=''
+    if job_loc!='' and job_loc!=None:
+        if 'person' in job_loc.lower():
+            j_loc='1'
+        if 'hybrid' in job_loc.lower():
+            j_loc='2'
+        if 'teleworking' in job_loc.lower():
+            j_loc='1'
+        if 'unspecified' in job_loc.lower():
+            j_loc='4'
+
+
+    #time
+    t_=''
+    if t_time!='' and t_time!=None:
+        if '24' in t_time.lower():
+            t_= '_24_HOURS'
+        if '7' in t_time.lower():
+            t_= '_7_DAYS'
+        if '15' in t_time.lower():
+            t_= '_15_DAYS'
+
+    
     if 'spain' in loc.lower():
-        url=requests.get(f'https://www.infojobs.net/webapp/offers/search?keyword=&segmentId=&page={str(page)}&sortBy=PUBLICATION_DATE&onlyForeignCountry=false&sinceDate=_24_HOURS', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
+        url=requests.get(f'https://www.infojobs.net/webapp/offers/search?keyword=&teleworkingIds={j_loc}&segmentId=&page={str(page)}&sortBy=PUBLICATION_DATE&onlyForeignCountry=false&sinceDate={t_}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
         a=json.loads(url.text)
     elif 'italy' in loc.lower():
-        url=requests.get(f'https://www.infojobs.net/webapp/offers/search?keyword=&segmentId=&page={str(page)}&sortBy=PUBLICATION_DATE&onlyForeignCountry=false&sinceDate=_24_HOURS', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
+        url=requests.get(f'https://www.infojobs.it/webapp/offers/search?keyword=&teleworkingIds={j_loc}&segmentId=&page={str(page)}&sortBy=PUBLICATION_DATE&onlyForeignCountry=false&sinceDate={t_}', headers = {'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'})
         a=json.loads(url.text)
     if a =='' or a==None:
         return None
@@ -107,7 +132,7 @@ def get_job(url):
             'image':i.find('img')['data-delayed-url'].replace('amp;','')
             }
             job_data.append(job)
-        print(len(job_data))
+        
         return job_data
     else:
-        return None
+        return url.status_code
